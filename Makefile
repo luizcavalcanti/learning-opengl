@@ -1,5 +1,10 @@
+example := triangles
+output_dir := bin
+output := $(output_dir)/$(example)
+
 build:
-	clang++ hello.cpp glad.c -o hello -Iinclude -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl 
+	mkdir -p $(output_dir)
+	clang++ -o $(output) -Iinclude -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl $(example).cpp glad.c
 
 run: build
-	./hello
+	./$(output)
