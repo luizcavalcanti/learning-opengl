@@ -1,4 +1,4 @@
-example := rectangles
+example := ex_01
 output_dir := bin
 output := $(output_dir)/$(example)
 
