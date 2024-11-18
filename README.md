@@ -251,3 +251,75 @@ glDeleteVertexArrays(1, &VAO);
 glDeleteBuffers(1, &VBO);
 glDeleteProgram(shaderProgram);
 ```
+
+#### Element Buffer Objects
+
+É uma maneira de criar uma coleção de vértices e reusá-los no input de vértices em um VBO. É comum que objetos complexos tenham vértices repetidos, na junção de triângulos, então dá pra fazer assim:
+
+```cpp
+float vertices[] = {
+    0.5f,  0.5f, 0.0f,  // top right
+    0.5f, -0.5f, 0.0f,  // bottom right
+    -0.5f, -0.5f, 0.0f,  // bottom left
+    -0.5f,  0.5f, 0.0f   // top left
+};
+unsigned int indices[] = { // os índices de 'vertices'
+    0, 1, 3,   // first triangle
+    1, 2, 3    // second triangle
+};
+```
+
+Para instanciar e utilizar um Element Buffer Object (EBO), é muito similar a outros objetos:
+
+```cpp
+unsigned int EBO;
+glGenBuffers(1, &EBO);
+
+// código de inicialização e uso do VBO, aqui...
+
+glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+```
+
+Na hora de desenhar, usamos uma função draw diferente:
+
+```cpp
+while (...) {
+    ...
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    ...
+}
+```
+
+VAOs também podem ser utilizadas para guardar EBOs, tornando tudo muito mais simples:
+
+```cpp
+...
+
+// Bind array first and then buffer
+glBindVertexArray(VAO);
+glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+// Send data to buffer
+glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+// Bind element buffer and configures it
+glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+// Set attibutes pointers/config
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+glEnableVertexAttribArray(0);
+
+...
+
+while (...) { //render
+    ...
+    glUseProgram(shaderProgram);
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+    ...
+}
+```
