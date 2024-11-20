@@ -3,8 +3,6 @@ Companion implementation and notes for https://learnopengl.com
 ---
 
 ## Notas
-
-
 ### Introdução
 
 **O que é?**
@@ -42,14 +40,6 @@ A especificação do OpenGL não entra em detalhes de sistema operacional/plataf
 
 Biblioteca implementada em C.
 
-
-### Shaders
-
-Como tudo representado no OpenGL em 3 dimensões, uma parte do trabalho do OpenGL é transformar as coordenadas 3D para um plano 2D (análogo à tela) e transformar estas coordenadas 2D em pixels coloridos.
-
-Para isso existe uma pipeline com passos altamente especializados e dependentes um dos outros, que são simples o suficiente para serem executados em paralelo com grande eficiência pelas GPUs: os shaders.
-
-Shaders podem ser configurados ou implementados pelos desenvolvedores e podem ser adicionados à pipeline. São escritos em GLSL (OpenGL Shading Language).
 
 ### Pipeline de renderização
 
@@ -323,3 +313,69 @@ while (...) { //render
     ...
 }
 ```
+
+
+### Shaders
+
+Como tudo representado no OpenGL em 3 dimensões, uma parte do trabalho do OpenGL é transformar as coordenadas 3D para um plano 2D (análogo à tela) e transformar estas coordenadas 2D em pixels coloridos.
+
+Para isso existe uma pipeline com passos altamente especializados e dependentes um dos outros, que são simples o suficiente para serem executados em paralelo com grande eficiência pelas GPUs: os shaders.
+
+Shaders podem ser configurados ou implementados pelos desenvolvedores e podem ser adicionados à pipeline. São escritos em GLSL (OpenGL Shading Language), uma linguagem C-like especialmente preparada para trabalhar com vetores e matrizes. Shaders não se comunicam entre si e outros programas, a não ser indiretamente via seus inputs e outputs.
+
+#### Estrutura básica
+
+```glsl
+#version version_number
+in type in_variable_name;
+in type in_variable_name;
+
+out type out_variable_name;
+
+uniform type uniform_name;
+
+void main() {
+    // processamento dos inputs e outras coisas
+    // definição dos valores de variável de saída (não há retorno explícito)
+    out_varible_name = some_value;
+}
+```
+
+O número máximo de variáveis de entrada varia com o tipo de shader, tendo o mínimo especificado pela OpenGL e com suporte adicional variando com o hardware. Em geral é possível consultar em tempo de execução, como por exemplo o número máximo de atributos de entrada para um Vertex Shader através da variável `GL_MAX_VERTEX_ATTRIBS`:
+
+```cpp
+int nrAttributes;
+glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
+std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
+```
+
+#### Tipos
+
+Os tipos básicos disponíveis são bem parecidos com C: `int`, `float`, `double`, `uint` e `bool`. Mas há também tipos complexos como `vector` e `matrices`.
+
+Os tipos vector podem ter 2, 3 ou 4 dimensões (n) e tem subtipos específicos:
+- vecn: vetor de `float`, com n dimensões
+- bvecn: vetor de `bool`
+- ivecn: vetor de `int`
+- uvecn: vetor de `uint`
+- dvecn: vetor de `double`
+
+Os componentes de um vector podem ser acessados como em `var.x`, sendo `x`, `y`, `z` e `w` os componentes em ordem. Alternativamente pode-se usar `r`, `g`, `b` e `a` (cores) ou `s`, `t`, `p` e `q` (textura) para acessar os mesmos componentes (o que fizer mais sentido no contexto).
+
+Ainda é possível acessar os componentes de um vector usando swizzling, encadeando até 4 componentes:
+
+```glsl
+vec2 someVec;
+vec4 differentVec = someVec.xyxx;
+vec3 anotherVec = differentVec.zyw;
+vec4 otherVec = someVec.xxxx + anotherVec.yxzy;
+vec4 otherResult = vec4(result.xyz, 1.0);
+```
+
+#### Entradas e saídas
+
+Sã̀o definidos pelas palavras-chave `in` e `out`.
+
+Como são organizados em pipelines, as saídas de um shader devem corresponder às entradas esperadas do próximo shader.
+
+As entradas de um shader são customizadas e dependem da saída do shader anterior. A exceção é o primeiro shader na pipeline: Vertex Shader. No Vertex Shader a entrada é obrigatoriamente o Vertex Data e é configurado via metadados de `location`. O Vertex Shader também é obrigado a produzir uma saída específica para entrada no Fragment Shader, um `vec4` especificando a cor do pixel.

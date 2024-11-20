@@ -1,4 +1,4 @@
-example := ex_01
+example := shaders
 output_dir := bin
 output := $(output_dir)/$(example)
 
