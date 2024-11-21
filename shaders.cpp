@@ -29,7 +29,7 @@ int main() {
         return -1;
     }
 
-    Shader myShader("shaders/invert.vs", "shaders/shader.fs");
+    Shader myShader("shaders/ex02.vs", "shaders/ex02.fs");
 
     // vertices data, VBO and VAO
     float vertices[] = {
@@ -57,7 +57,6 @@ int main() {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3*sizeof(float)));
     glEnableVertexAttribArray(1);
 
-
     while (!glfwWindowShouldClose(window))
         {
             processInput(window);
@@ -67,6 +66,7 @@ int main() {
 
             myShader.use();
 
+            myShader.setFloat("horizontalOffset", 0.3f);
             // int vertexColorLocation = glGetUniformLocation(shaderProgram, "myColor");
             // float timeValue = glfwGetTime();
             // float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
