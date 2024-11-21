@@ -29,7 +29,7 @@ int main() {
         return -1;
     }
 
-    Shader myShader("shaders/shader.vs", "shaders/shader.fs");
+    Shader myShader("shaders/invert.vs", "shaders/shader.fs");
 
     // vertices data, VBO and VAO
     float vertices[] = {
