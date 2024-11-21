@@ -379,3 +379,44 @@ Sã̀o definidos pelas palavras-chave `in` e `out`.
 Como são organizados em pipelines, as saídas de um shader devem corresponder às entradas esperadas do próximo shader.
 
 As entradas de um shader são customizadas e dependem da saída do shader anterior. A exceção é o primeiro shader na pipeline: Vertex Shader. No Vertex Shader a entrada é obrigatoriamente o Vertex Data e é configurado via metadados de `location`. O Vertex Shader também é obrigado a produzir uma saída específica para entrada no Fragment Shader, um `vec4` especificando a cor do pixel.
+
+Exemplo:
+
+```gls
+// vertex shader
+#version 330 core
+layout (location = 0) in vec3 aPos;
+out vec4 vertexColor;
+
+void main() {
+    gl_Position = vec4(aPos, 1.0);
+    vertexColor = vec4(0.5, 0.0, 0.0, 1.0);
+}
+
+// fragment shader
+#version 330 core
+in vec4 vertexColor;
+out vec4 FragColor;
+
+void main() {
+    FragColor = vertexColor;
+}
+```
+
+#### Uniforms
+
+Outra maneira de passar dados para os shaders. Ao contrário do Vertex Data, Uniforms são globais e únicos a um Shader Program. Podem ser acessados por qualquer shader a qualquer momento.
+
+O shader que quiser usar os valores do Uniform deve declará-lo na mesma seção das variáveis de entrada e saída.
+```glsl
+uniform vec4 ourColor;
+```
+
+Para definir o valor do Uniform no programa OpenGL:
+
+```glsl
+glUseProgram(shaderProgram);
+
+int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+glUniform4f(vertexColorLocation, 0.0f, 1.0f, 0.0f, 1.0f);
+```
