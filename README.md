@@ -420,3 +420,55 @@ glUseProgram(shaderProgram);
 int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
 glUniform4f(vertexColorLocation, 0.0f, 1.0f, 0.0f, 1.0f);
 ```
+
+### Texturas
+
+Cada vértice deve ter uma coordenada da textura associada a ele, para que o sampling possa ser feito pela interpolação dos fragmentos. Para texturas 2D, as coordenadas tem componentes `x` e `y` variando de 0.0 a 1.0.
+
+
+#### Wrapping
+
+Quando uma textura é menor que a área que precisa cobrir, o OpenGL precisa definir o que será feito com a área restante na superfície. Isso é chamado de envelopamento.
+
+Os valores possíveis de envolpamento de texturas são: `GL_REPEAT`, `GL_MIRRORED_REPEAT`, `GL_CLAMP_TO_EDGE` e `GL_CLAMP_TO_BORDER`.
+
+Para definir o método de envelopamento:
+```cpp
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+```
+
+#### Filtragem
+
+Quando um pixel de textura (texel) não corresponde diretamente a um pixel da superfície, o OpenGL faz o processo de __filtering__ para definir qual a cor daquele ponto na superfície. Os valores podem ser `GL_NEAREST`, que usa o valor do texel mais próximo, e o `GL_LINEAR`, que usa uma média linear entre os 4 texels mais próximos.
+
+Ainda é possível definir qual a filtragem usada quando a textura é maior que a superfície (minifying) ou menor que a superfície (magnifying).
+
+Para definir a filtragem:
+
+```cpp
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+```
+
+#### Mipmaps
+
+Uma coleção de imagens de textura representando várias resoluções diferentes, cada uma metade da anterior.
+
+É possível combinar a definição de filtragem de texturas com a filtragem de mipmaps, usando os seguintes valores possíveis: `GL_NEAREST_MIPMAP_NEAREST`, `GL_LINEAR_MIPMAP_NEAREST`, `GL_NEAREST_MIPMAP_LINEAR` e `GL_LINEAR_MIPMAP_LINEAR`.
+
+
+```cpp
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+```
+
+#### Gerando texturas
+
+```cpp
+unsigned int texture;
+glGenTextures(1, &texture);
+glBindTexture(GL_TEXTURE_2D, texture);
+glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+glGenerateMipmap(GL_TEXTURE_2D);
+```
