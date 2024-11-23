@@ -1,22 +1,25 @@
-example := textures
-output_dir := bin
-output := $(output_dir)/$(example)
-
 UNAME := $(shell uname)
+EXAMPLE = textures
+OUTPUT_DIR = bin
+OUTPUT = $(OUTPUT_DIR)/$(EXAMPLE)
+
+CFILES = $(EXAMPLE).cpp \
+	glad.c \
+	shader.cpp \
+	stb_image.cpp
+
+CFLAGS = -Iinclude -lglfw -ldl -lX11 -lpthread
 
 ifeq ($(UNAME), Darwin)
-CFLAGS = -Iinclude -lglfw -ldl -framework OpenGL
+	CFLAGS += -framework OpenGL
+else
+	CFLAGS += -lGL -lXrandr -lXi
 endif
 
-ifeq ($(UNAME), Linux)
-CFLAGS = -Iinclude -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl
-endif
-
-CFILES = $(example).cpp glad.c shader.cpp stb_image.cpp
 
 build:
-	mkdir -p $(output_dir)
-	clang++ $(CFLAGS) $(CFILES) -o $(output)
+	mkdir -p $(OUTPUT_DIR)
+	clang++ $(CFLAGS) $(CFILES) -o $(OUTPUT)
 
 run: build
-	./$(output)
+	./$(OUTPUT)
