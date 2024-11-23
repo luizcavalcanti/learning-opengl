@@ -18,7 +18,7 @@ const unsigned int SCR_HEIGHT = 600;
 int main() {
     initGLFW();
 
-    GLFWwindow* window = createWindow(SCR_WIDTH, SCR_HEIGHT, "Teste", true);
+    GLFWwindow* window = createWindow(SCR_WIDTH, SCR_HEIGHT, "Teste", false);
     if (!window) {
         std::cout << "Failed to create GLFW window" << std::endl;
         return -1;
